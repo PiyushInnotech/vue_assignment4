@@ -2,6 +2,7 @@
   <div class="formStart">
     <label class="formLabel">EMAIL:</label>
     <input type="email" required v-model="email" />
+    <div v-if="emailValidate" class="error">{{ emailValidate }}</div>
 
     <label class="formLabel">PASSWORD:</label>
     <input type="password" v-model="password" />
@@ -13,6 +14,7 @@
       <option value="web Developer">WEB DEVELOPER</option>
       <option value="web Designer">WEB DESIGNER</option>
     </select>
+
     <label class="formLabel">SKILLS:</label>
     <input type="text" v-model="skillTemp" @keyup="addSkill" />
     <div class="skills" v-for="skill in skills" :key="skill">
@@ -20,13 +22,16 @@
         {{ skill }} <i class="fa-solid fa-circle-xmark"></i>
       </div>
     </div>
+
     <div class="formCheck">
       <input type="checkbox" v-model="term" />
       <label>accept terms and conditions</label>
     </div>
+
     <label class="formLabel error">{{ warning }}</label>
     <button @click.prevent="formSubmit">Create an account</button>
   </div>
+
   <div class="formDetails" :class="{ hidden: !formSubmitted }">
     <h1>Email: {{ email }}</h1>
     <h1>Password: {{ password }}</h1>
@@ -53,6 +58,8 @@ export default {
       passwordReg: "",
       formSubmitted: false,
       warning: "",
+      emailValidate: "",
+      emailReg: "",
     };
   },
   methods: {
@@ -80,16 +87,24 @@ export default {
       this.passwordReg = new RegExp(
         "(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*(),.?:{}|<>])"
       );
-      if (this.email && this.role && this.term) {
-        if (this.password.length < 8) {
-          this.passwordValidation =
-            "Password length should be more than 8 characters";
-        } else if (!this.passwordReg.test(this.password)) {
-          this.passwordValidation =
-            "Password is not strong enough must contain a number upper,lower and special char";
+      this.emailReg = new RegExp(
+        "^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-zA-Z0-9.-]+$"
+      );
+      if (this.email && this.role && this.term && this.password) {
+        if (this.emailReg.test(this.email)) {
+          this.emailValidate = "";
+          if (this.password.length < 8) {
+            this.passwordValidation =
+              "Password length should be more than 8 characters";
+          } else if (!this.passwordReg.test(this.password)) {
+            this.passwordValidation =
+              "Password is not strong enough must contain a number upper,lower and special char";
+          } else {
+            this.passwordValidation = "";
+            this.formSubmitted = true;
+          }
         } else {
-          this.passwordValidation = "";
-          this.formSubmitted = true;
+          this.emailValidate = "Enter a valid email";
         }
         this.warning = "";
       } else {
