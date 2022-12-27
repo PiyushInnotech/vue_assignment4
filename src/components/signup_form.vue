@@ -5,6 +5,7 @@
 
     <label class="formLabel">PASSWORD:</label>
     <input type="password" required v-model="password" />
+    <div v-if="passwordValidation" class="error">{{ passwordValidation }}</div>
 
     <label class="formLabel">ROLE:</label>
     <select required v-model="role">
@@ -13,9 +14,9 @@
       <option value="web Designer">WEB DESIGNER</option>
     </select>
     <label class="formLabel">SKILLS:</label>
-    <input type="text"  v-model="skillTemp" @keyup="addSkill" />
+    <input type="text" v-model="skillTemp" @keyup="addSkill" />
     <div class="skills" v-for="skill in skills" :key="skill">
-      <div @click="deleteSkill(skill)"> {{ skill }} </div>
+      <div @click="deleteSkill(skill)">{{ skill }}</div>
     </div>
     <div class="formCheck">
       <input type="checkbox" required v-model="term" />
@@ -36,22 +37,50 @@ export default {
       term: false,
       skillTemp: "",
       skills: [],
+      passwordValidation: "",
+      lowerCase: "",
+      upperCase: "",
+      number: "",
+      specialChar: "",
     };
   },
   methods: {
     addSkill(e) {
       if (e.key === "," && this.skillTemp) {
         if (!this.skills.includes(this.skillTemp)) {
+          this.skillTemp = this.skillTemp.slice(0, this.skillTemp.length - 1);
           this.skills.push(this.skillTemp);
         }
         this.skillTemp = "";
       }
     },
-    deleteSkill(skill){
+    deleteSkill(skill) {
       this.skills = this.skills.filter((item) => {
-        return skill !== item
-      }) 
-    }
+        return skill !== item;
+      });
+    },
+    formSubmit() {
+      this.lowerCase = new RegExp("(?=.*[a-z])");
+      this.upperCase = new RegExp("(?=.*[A-Z])");
+      this.number = new RegExp("(?=.*[0-9])");
+      this.specialChar = new RegExp('(?=.*[!@#$%^&*(),.?":{}|<>])');
+      if (this.password.length < 8) {
+        this.passwordValidation =
+          "Password length should be more than 8 characters";
+      } else if (!this.lowerCase.test(this.password)) {
+        this.passwordValidation =
+          "Password must contain a lower case character";
+      } else if (!this.upperCase.test(this.password)) {
+        this.passwordValidation =
+          "Password must contain an upper case character";
+      } else if (!this.number.test(this.password)) {
+        this.passwordValidation = "Password must contain a numerical value";
+      } else if (!this.specialChar.test(this.password)) {
+        this.passwordValidation = "Password must contain a special Character";
+      } else {
+        this.passwordValidation = "";
+      }
+    },
   },
 };
 </script>
@@ -60,7 +89,6 @@ export default {
 form {
   width: 90%;
   margin-left: 6%;
-  
 }
 .formLabel {
   width: 80%;
@@ -96,7 +124,6 @@ select {
 .skills {
   margin-top: 20px;
   background-color: #bec2c4;
-  width: 100px;
   display: inline-block;
   margin-left: 10px;
   padding: 7px 20px;
@@ -133,5 +160,10 @@ button {
   font-size: 20px;
   border: none;
   cursor: pointer;
+}
+.error {
+  color: red;
+  font-size: 20px;
+  margin-top: 10px;
 }
 </style>

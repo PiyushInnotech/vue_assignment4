@@ -16,7 +16,7 @@ export default {
 </script>
 
 <style scoped>
-.formBody{
+.formBody {
   height: 94vh;
   width: 95%;
   margin-left: 2.5%;
