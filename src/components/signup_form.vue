@@ -1,14 +1,14 @@
 <template>
-  <form @submit.prevent="formSubmit">
+  <div class="formStart">
     <label class="formLabel">EMAIL:</label>
     <input type="email" required v-model="email" />
 
     <label class="formLabel">PASSWORD:</label>
-    <input type="password" required v-model="password" />
+    <input type="password" v-model="password" />
     <div v-if="passwordValidation" class="error">{{ passwordValidation }}</div>
 
     <label class="formLabel">ROLE:</label>
-    <select required v-model="role">
+    <select v-model="role">
       <option value="">SELECT A ROLE</option>
       <option value="web Developer">WEB DEVELOPER</option>
       <option value="web Designer">WEB DESIGNER</option>
@@ -16,16 +16,28 @@
     <label class="formLabel">SKILLS:</label>
     <input type="text" v-model="skillTemp" @keyup="addSkill" />
     <div class="skills" v-for="skill in skills" :key="skill">
-      <div @click="deleteSkill(skill)">{{ skill }}</div>
+      <div @click="deleteSkill(skill)">
+        {{ skill }} <i class="fa-solid fa-circle-xmark"></i>
+      </div>
     </div>
     <div class="formCheck">
-      <input type="checkbox" required v-model="term" />
+      <input type="checkbox" v-model="term" />
       <label>accept terms and conditions</label>
     </div>
-    <button>Create an account</button>
-  </form>
+    <label class="formLabel error">{{ warning }}</label>
+    <button @click.prevent="formSubmit">Create an account</button>
+  </div>
+  <div class="formDetails" :class="{ hidden: !formSubmitted }">
+    <h1>Email: {{ email }}</h1>
+    <h1>Password: {{ password }}</h1>
+    <h1>Role: {{ role }}</h1>
+    <div class="skillsDetail">
+      <h1>Skills:</h1>
+      <h1 v-for="skill in skills" :key="skill">{{ skill }}</h1>
+    </div>
+    <h1>Terms Accepted: {{ term }}</h1>
+  </div>
 </template>
-
 <script>
 export default {
   name: "signup_form",
@@ -38,10 +50,9 @@ export default {
       skillTemp: "",
       skills: [],
       passwordValidation: "",
-      lowerCase: "",
-      upperCase: "",
-      number: "",
-      specialChar: "",
+      passwordReg: "",
+      formSubmitted: false,
+      warning: "",
     };
   },
   methods: {
@@ -53,6 +64,12 @@ export default {
         }
         this.skillTemp = "";
       }
+      if (e.key === "Enter" && this.skillTemp) {
+        if (!this.skills.includes(this.skillTemp)) {
+          this.skills.push(this.skillTemp);
+        }
+        this.skillTemp = "";
+      }
     },
     deleteSkill(skill) {
       this.skills = this.skills.filter((item) => {
@@ -60,25 +77,23 @@ export default {
       });
     },
     formSubmit() {
-      this.lowerCase = new RegExp("(?=.*[a-z])");
-      this.upperCase = new RegExp("(?=.*[A-Z])");
-      this.number = new RegExp("(?=.*[0-9])");
-      this.specialChar = new RegExp('(?=.*[!@#$%^&*(),.?":{}|<>])');
-      if (this.password.length < 8) {
-        this.passwordValidation =
-          "Password length should be more than 8 characters";
-      } else if (!this.lowerCase.test(this.password)) {
-        this.passwordValidation =
-          "Password must contain a lower case character";
-      } else if (!this.upperCase.test(this.password)) {
-        this.passwordValidation =
-          "Password must contain an upper case character";
-      } else if (!this.number.test(this.password)) {
-        this.passwordValidation = "Password must contain a numerical value";
-      } else if (!this.specialChar.test(this.password)) {
-        this.passwordValidation = "Password must contain a special Character";
+      this.passwordReg = new RegExp(
+        "(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*(),.?:{}|<>])"
+      );
+      if (this.email && this.role && this.term) {
+        if (this.password.length < 8) {
+          this.passwordValidation =
+            "Password length should be more than 8 characters";
+        } else if (!this.passwordReg.test(this.password)) {
+          this.passwordValidation =
+            "Password is not strong enough must contain a number upper,lower and special char";
+        } else {
+          this.passwordValidation = "";
+          this.formSubmitted = true;
+        }
+        this.warning = "";
       } else {
-        this.passwordValidation = "";
+        this.warning = "please fill all the above fields";
       }
     },
   },
@@ -86,7 +101,7 @@ export default {
 </script>
 
 <style scoped>
-form {
+.formStart {
   width: 90%;
   margin-left: 6%;
 }
@@ -153,6 +168,7 @@ button {
   width: 250px;
   margin-top: 40px;
   margin-left: 35%;
+  margin-bottom: 40px;
   height: 50px;
   border-radius: 25px;
   background-color: #6ea4e6;
@@ -165,5 +181,23 @@ button {
   color: red;
   font-size: 20px;
   margin-top: 10px;
+}
+.formDetails {
+  margin-top: 20px;
+  align-items: center;
+  text-align: center;
+}
+.skillsDetail {
+  display: block;
+}
+.skillsDetail h1 {
+  display: inline-block;
+  margin-left: 10px;
+}
+.hidden {
+  display: none;
+}
+i {
+  color: grey;
 }
 </style>

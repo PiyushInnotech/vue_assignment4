@@ -17,12 +17,13 @@ export default {
 
 <style scoped>
 .formBody {
-  height: 94vh;
+  height: 100%;
   width: 95%;
   margin-left: 2.5%;
   background-color: white;
   margin-top: 1.5%;
   border-radius: 10px;
   color: #bec2c4;
+  margin-bottom: 30px;
 }
 </style>
